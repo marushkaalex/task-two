@@ -4,46 +4,57 @@ import com.epam.am.text.entity.Component;
 import com.epam.am.text.entity.Composite;
 import com.epam.am.text.entity.Symbol;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegexParser implements Parser {
     private Map<Class<? extends Component>, Pattern> patternMap;
-    private Map<Class<? extends Composite>, Class<? extends Component>> componentMap;
+    private Map<Class<? extends Composite>, List<Class<? extends Component>>> componentMap;
 
     public RegexParser(
             Map<Class<? extends Component>, Pattern> patternMap,
-            Map<Class<? extends Composite>, Class<? extends Component>> componentMap
+            Map<Class<? extends Composite>, List<Class<? extends Component>>> componentMap
     ) {
         this.patternMap = patternMap;
         this.componentMap = componentMap;
     }
 
-    public <T extends Composite> T parse(Class<T> compositeClass, String source, int start, int end) {
-        T t;
+    public <T extends Component> T parse(Class<T> componentClass, String source, int start, int end) {
 
         try {
-            t = compositeClass.newInstance();
-            Class componentClass = componentMap.get(compositeClass);
+            if (Symbol.class.isAssignableFrom(componentClass)) {
+                return componentClass.getDeclaredConstructor(char.class).newInstance(source.charAt(start));
+            }
 
-            if (componentClass == Symbol.class) {
-                Symbol symbol;
-                for (int i = start; i < end; i++) {
-                    symbol = new Symbol(source.charAt(i));
-                    t.add(symbol);
-                }
-            } else {
-                Pattern componentPattern = patternMap.get(componentClass);
-                Matcher matcher = componentPattern.matcher(source);
-                while (matcher.find()) {
-                    Component component = parse(componentClass, source, matcher.start(), matcher.end());
-                    t.add(component);
+            T t;
+            t = componentClass.newInstance();
+            for (Class innerComponentClass : componentMap.get(componentClass)) {
+                Composite composite = (Composite) t;
+                if (innerComponentClass.isAssignableFrom(Symbol.class)) {
+                    Symbol symbol;
+                    for (int i = start; i < end; i++) {
+                        symbol = ((Symbol) innerComponentClass.getDeclaredConstructor(char.class).newInstance(source.charAt(i)));
+                        composite.add(symbol);
+                    }
+                } else {
+                    Pattern componentPattern = patternMap.get(innerComponentClass);
+                    Matcher matcher = componentPattern.matcher(source);
+                    int tmpStart = start;
+                    while (matcher.find(tmpStart) && matcher.end() <= end) {
+                        tmpStart = matcher.start();
+                        int tmpEnd = matcher.end();
+                        Component component = parse(innerComponentClass, source, tmpStart, matcher.end());
+                        tmpStart = tmpEnd;
+                        composite.add(component);
+                    }
                 }
             }
 
             return t;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

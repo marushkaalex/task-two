@@ -1,6 +1,6 @@
 package com.epam.am.text.entity;
 
-public class Symbol implements Leaf {
+public abstract class Symbol implements Leaf {
     private char value;
 
     public Symbol(char value) {
@@ -9,5 +9,10 @@ public class Symbol implements Leaf {
 
     public void toPlainString(StringBuilder sb) {
         sb.append(value);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 }

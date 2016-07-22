@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 public abstract class AbstractComposite<E extends Component> implements Composite<E> {
     private List<E> componentList = new ArrayList<>();
-    private Pattern pattern;
 
     public void add(E component) {
         componentList.add(component);
@@ -20,5 +19,12 @@ public abstract class AbstractComposite<E extends Component> implements Composit
         for (E item : componentList) {
             item.toPlainString(sb);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        componentList.forEach(sb::append);
+        return sb.toString();
     }
 }

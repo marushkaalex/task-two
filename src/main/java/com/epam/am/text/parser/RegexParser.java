@@ -31,24 +31,32 @@ public class RegexParser implements Parser {
 
             T t;
             t = componentClass.newInstance();
-            for (Class innerComponentClass : componentMap.get(componentClass)) {
-                Composite composite = (Composite) t;
-                if (innerComponentClass.isAssignableFrom(Symbol.class)) {
-                    Symbol symbol;
-                    for (int i = start; i < end; i++) {
-                        symbol = ((Symbol) innerComponentClass.getDeclaredConstructor(char.class).newInstance(source.charAt(i)));
-                        composite.add(symbol);
-                    }
-                } else {
-                    Pattern componentPattern = patternMap.get(innerComponentClass);
-                    Matcher matcher = componentPattern.matcher(source);
-                    int tmpStart = start;
-                    while (matcher.find(tmpStart) && matcher.end() <= end) {
+            int tmpStart = start;
+            int tmpEnd = end;
+            while (true) {
+                if (tmpStart >= tmpEnd) {
+                    break;
+                }
+
+                for (Class innerComponentClass : componentMap.get(componentClass)) {
+                    Composite composite = (Composite) t;
+                    if (innerComponentClass.isAssignableFrom(Symbol.class)) {
+                        Symbol symbol;
+                        for (int i = start; i < end; i++) {
+                            symbol = ((Symbol) innerComponentClass.getDeclaredConstructor(char.class).newInstance(source.charAt(i)));
+                            composite.add(symbol);
+                        }
+                    } else {
+                        Pattern componentPattern = patternMap.get(innerComponentClass);
+                        Matcher matcher = componentPattern.matcher(source);
+                        boolean found = matcher.find(tmpStart);
+                        if (!found) continue;
                         tmpStart = matcher.start();
-                        int tmpEnd = matcher.end();
                         Component component = parse(innerComponentClass, source, tmpStart, matcher.end());
-                        tmpStart = tmpEnd;
+                        tmpStart += 1;
+//                        tmpEnd = matcher.end();
                         composite.add(component);
+                        break;
                     }
                 }
             }

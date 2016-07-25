@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class Runner {
     public static void main(String[] args) {
         Map<Class<? extends Component>, Pattern> patternMap = new HashMap<>();
-        patternMap.put(Word.class, Pattern.compile("(?<!\\W)\\w+"));
+        patternMap.put(Word.class, Pattern.compile("(?<!\\w)\\w+"));
         patternMap.put(Sentence.class, Pattern.compile("(?<!\\W).+?\\p{Punct}"));
         patternMap.put(PunctuationSymbol.class, Pattern.compile("\\p{Punct}"));
         patternMap.put(WordSymbol.class, Pattern.compile("\\p{Alpha}"));

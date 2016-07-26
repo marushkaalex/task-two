@@ -15,17 +15,19 @@ public class Runner {
         patternMap.put(PunctuationSymbol.class, Pattern.compile("\\p{Punct}"));
         patternMap.put(WordSymbol.class, Pattern.compile("\\p{Alpha}"));
         patternMap.put(WhitespaceSymbol.class, Pattern.compile("\\s"));
-        patternMap.put(Paragraph.class, Pattern.compile("[^\\n]+?"));
+        patternMap.put(Paragraph.class, Pattern.compile("[^\\n]+\\n*"));
+        patternMap.put(Text.class, Pattern.compile("^.*$"));
 
         Map<Class<? extends Composite>, List<Class<? extends Component>>> componentMap = new HashMap<>();
         componentMap.put(Word.class, Collections.singletonList(WordSymbol.class));
         componentMap.put(Sentence.class, Arrays.asList(Word.class, PunctuationSymbol.class, WhitespaceSymbol.class));
         componentMap.put(Paragraph.class, Collections.singletonList(Sentence.class));
+        componentMap.put(Text.class, Collections.singletonList(Paragraph.class));
 
         Parser parser = new RegexParser(patternMap, componentMap);
-        String testString = "There we have a sentence. And another one is here. Test? Test!";
-        Paragraph paragraph = parser.parse(Paragraph.class, testString, 0, testString.length());
-        System.out.println(paragraph);
-        paragraph.forEach(System.out::println);
+        String testString = "There we. And another one is here. \nTest? Test!";
+        Composite text = parser.parse(Text.class, testString, 0, testString.length());
+        System.out.println(text);
+        text.forEach(System.out::println);
     }
 }

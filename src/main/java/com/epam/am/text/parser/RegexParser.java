@@ -62,7 +62,8 @@ public class RegexParser implements Parser {
                     }
                 }
 
-                if (!check) throw new RuntimeException("!check");
+                if (!check)
+                    throw new RuntimeException(String.format("Can not parse: %s", source.substring(tmpStart, tmpEnd)));
             }
 
             return t;

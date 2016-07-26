@@ -1,6 +1,7 @@
 package com.epam.am.text.entity;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -26,5 +27,10 @@ public abstract class AbstractComposite<E extends Component> implements Composit
         StringBuilder sb = new StringBuilder();
         componentList.forEach(sb::append);
         return sb.toString();
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return componentList.iterator();
     }
 }

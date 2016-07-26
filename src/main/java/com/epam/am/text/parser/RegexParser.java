@@ -38,6 +38,8 @@ public class RegexParser implements Parser {
                     break;
                 }
 
+                boolean check = false;
+
                 for (Class innerComponentClass : componentMap.get(componentClass)) {
                     Composite composite = (Composite) t;
                     if (innerComponentClass.isAssignableFrom(Symbol.class)) {
@@ -55,9 +57,12 @@ public class RegexParser implements Parser {
                         Component component = parse(innerComponentClass, source, tmpStart, matcher.end());
                         tmpStart = matcher.end();
                         composite.add(component);
+                        check = true;
                         break;
                     }
                 }
+
+                if (!check) throw new RuntimeException("!check");
             }
 
             return t;

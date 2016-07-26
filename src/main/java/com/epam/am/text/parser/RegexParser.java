@@ -1,12 +1,9 @@
 package com.epam.am.text.parser;
 
-import com.epam.am.text.entity.Component;
-import com.epam.am.text.entity.Composite;
-import com.epam.am.text.entity.Symbol;
+import com.epam.am.text.entity.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,4 +75,25 @@ public class RegexParser implements Parser {
         return ((Symbol) symbolClass.getDeclaredConstructor(char.class).newInstance(source.charAt(position)));
     }
 
+    public static class DefaultConfig {
+        public static final Map<Class<? extends Component>, Pattern> PATTERN_MAP;
+        public static final Map<Class<? extends Composite>, List<Class<? extends Component>>> COMPONENT_MAP;
+
+        static {
+            PATTERN_MAP = new HashMap<>();
+            PATTERN_MAP.put(Word.class, Pattern.compile("(?<!\\w)\\w+"));
+            PATTERN_MAP.put(Sentence.class, Pattern.compile(".+?[!.?]+\\s*"));
+            PATTERN_MAP.put(PunctuationSymbol.class, Pattern.compile("\\p{Punct}"));
+            PATTERN_MAP.put(WordSymbol.class, Pattern.compile("\\p{Alpha}"));
+            PATTERN_MAP.put(WhitespaceSymbol.class, Pattern.compile("\\s"));
+            PATTERN_MAP.put(Paragraph.class, Pattern.compile("[^\\n]+\\n*"));
+            PATTERN_MAP.put(Text.class, Pattern.compile("^.*$"));
+
+            COMPONENT_MAP = new HashMap<>();
+            COMPONENT_MAP.put(Word.class, Collections.singletonList(WordSymbol.class));
+            COMPONENT_MAP.put(Sentence.class, Arrays.asList(Word.class, PunctuationSymbol.class, WhitespaceSymbol.class));
+            COMPONENT_MAP.put(Paragraph.class, Collections.singletonList(Sentence.class));
+            COMPONENT_MAP.put(Text.class, Collections.singletonList(Paragraph.class));
+        }
+    }
 }

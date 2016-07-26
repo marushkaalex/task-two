@@ -22,11 +22,12 @@ public class RegexParser implements Parser {
         this.componentMap = componentMap;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Component> T parse(Class<T> componentClass, String source, int start, int end) {
 
         try {
             if (Symbol.class.isAssignableFrom(componentClass)) {
-                return componentClass.getDeclaredConstructor(char.class).newInstance(source.charAt(start));
+                return (T) parseSymbol(componentClass, source, start);
             }
 
             T t;
@@ -45,7 +46,7 @@ public class RegexParser implements Parser {
                     if (innerComponentClass.isAssignableFrom(Symbol.class)) {
                         Symbol symbol;
                         for (int i = start; i < end; i++) {
-                            symbol = ((Symbol) innerComponentClass.getDeclaredConstructor(char.class).newInstance(source.charAt(i)));
+                            symbol = parseSymbol(innerComponentClass, source, start);
                             composite.add(symbol);
                         }
                     } else {
@@ -71,4 +72,10 @@ public class RegexParser implements Parser {
             throw new RuntimeException(e);
         }
     }
+
+    private Symbol parseSymbol(Class<? extends Component> symbolClass, String source, int position)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return ((Symbol) symbolClass.getDeclaredConstructor(char.class).newInstance(source.charAt(position)));
+    }
+
 }

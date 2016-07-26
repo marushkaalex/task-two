@@ -17,10 +17,11 @@ public class Runner {
         patternMap.put(Sentence.class, Pattern.compile("(?<!\\W).+?\\p{Punct}"));
         patternMap.put(PunctuationSymbol.class, Pattern.compile("\\p{Punct}"));
         patternMap.put(WordSymbol.class, Pattern.compile("\\p{Alpha}"));
+        patternMap.put(WhitespaceSymbol.class, Pattern.compile("\\s"));
 
         Map<Class<? extends Composite>, List<Class<? extends Component>>> componentMap = new HashMap<>();
         componentMap.put(Word.class, Arrays.asList(WordSymbol.class));
-        componentMap.put(Sentence.class, Arrays.asList(Word.class, PunctuationSymbol.class));
+        componentMap.put(Sentence.class, Arrays.asList(Word.class, PunctuationSymbol.class, WhitespaceSymbol.class));
 
         Parser parser = new RegexParser(patternMap, componentMap);
         String testString = "There we have a sentence.";

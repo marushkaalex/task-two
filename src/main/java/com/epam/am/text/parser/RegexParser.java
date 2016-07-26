@@ -50,11 +50,10 @@ public class RegexParser implements Parser {
                         Pattern componentPattern = patternMap.get(innerComponentClass);
                         Matcher matcher = componentPattern.matcher(source);
                         boolean found = matcher.find(tmpStart);
-                        if (!found) continue;
+                        if (!found || matcher.start() != tmpStart) continue;
                         tmpStart = matcher.start();
                         Component component = parse(innerComponentClass, source, tmpStart, matcher.end());
-                        tmpStart += 1;
-//                        tmpEnd = matcher.end();
+                        tmpStart = matcher.end();
                         composite.add(component);
                         break;
                     }

@@ -19,8 +19,18 @@ public class RegexParser implements Parser {
         this.componentMap = componentMap;
     }
 
+    @Override
+    public <T extends Component> T parse(Class<T> componentClass, String source) {
+        return parse(componentClass, source, 0, source.length());
+    }
+
+    @Override
+    public Text parse(String source) {
+        return parse(Text.class, source);
+    }
+
     @SuppressWarnings("unchecked")
-    public <T extends Component> T parse(Class<T> componentClass, String source, int start, int end) {
+    private  <T extends Component> T parse(Class<T> componentClass, String source, int start, int end) {
 
         try {
             if (Symbol.class.isAssignableFrom(componentClass)) {

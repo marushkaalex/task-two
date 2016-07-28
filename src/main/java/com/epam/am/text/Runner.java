@@ -14,7 +14,7 @@ public class Runner {
     public static void main(String[] args) {
         Parser parser = new RegexParser(RegexParser.DefaultConfig.PATTERN_MAP, RegexParser.DefaultConfig.COMPONENT_MAP);
         String testString = "There we. And another one is here. \nTest? Test!";
-        Text text = parser.parse(Text.class, testString, 0, testString.length());
+        Text text = parser.parse(testString);
         log.info(text.toString());
         text.forEach(i -> log.info(i.toString()));
 

@@ -12,7 +12,7 @@ public class Runner {
     private static final Logger log = LoggerFactory.getLogger(Runner.class);
 
     public static void main(String[] args) {
-        Parser parser = new RegexParser(RegexParser.DefaultConfig.PATTERN_MAP, RegexParser.DefaultConfig.COMPONENT_MAP);
+        Parser parser = new RegexParser();
         String testString = "There we. And another one is here. \nTest? Test!";
         Text text = parser.parse(testString);
         log.info(text.toString());

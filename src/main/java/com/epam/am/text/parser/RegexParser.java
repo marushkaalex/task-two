@@ -11,12 +11,9 @@ public class RegexParser implements Parser {
     private Map<Class<? extends Component>, Pattern> patternMap;
     private Map<Class<? extends Composite>, List<Class<? extends Component>>> componentMap;
 
-    public RegexParser(
-            Map<Class<? extends Component>, Pattern> patternMap,
-            Map<Class<? extends Composite>, List<Class<? extends Component>>> componentMap
-    ) {
-        this.patternMap = patternMap;
-        this.componentMap = componentMap;
+    public RegexParser() {
+        this.patternMap = DefaultConfig.PATTERN_MAP;
+        this.componentMap = DefaultConfig.COMPONENT_MAP;
     }
 
     @Override

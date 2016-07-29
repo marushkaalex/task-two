@@ -28,7 +28,6 @@ public class RegexParser implements Parser {
 
     @SuppressWarnings("unchecked")
     private  <T extends Component> T parse(Class<T> componentClass, String source, int start, int end) {
-
         try {
             if (Symbol.class.isAssignableFrom(componentClass)) {
                 return (T) parseSymbol(componentClass, source, start);
@@ -68,12 +67,16 @@ public class RegexParser implements Parser {
                 }
 
                 if (!check)
-                    throw new RuntimeException(String.format("Can not parse: %s", source.substring(tmpStart, tmpEnd)));
+                    throw new ParsingException(String.format(
+                            "Can not parse '%s' into %s",
+                            source.substring(tmpStart, tmpEnd),
+                            componentClass
+                    ));
             }
 
             return t;
         } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new ParsingException(e);
         }
     }
 
@@ -88,10 +91,10 @@ public class RegexParser implements Parser {
 
         static {
             PATTERN_MAP = new HashMap<>();
-            PATTERN_MAP.put(Word.class, Pattern.compile("(?<!\\w)\\w+"));
-            PATTERN_MAP.put(Sentence.class, Pattern.compile(".+?[!.?]+\\s*"));
+            PATTERN_MAP.put(Word.class, Pattern.compile("(?<!\\p{L})\\p{L}+"));
+            PATTERN_MAP.put(Sentence.class, Pattern.compile(".+?[!.?\\n]+\\s*"));
             PATTERN_MAP.put(PunctuationSymbol.class, Pattern.compile("\\p{Punct}"));
-            PATTERN_MAP.put(WordSymbol.class, Pattern.compile("\\p{Alpha}"));
+            PATTERN_MAP.put(WordSymbol.class, Pattern.compile("\\p{L}"));
             PATTERN_MAP.put(WhitespaceSymbol.class, Pattern.compile("\\s"));
             PATTERN_MAP.put(Paragraph.class, Pattern.compile("[^\\n]+\\n*"));
             PATTERN_MAP.put(Text.class, Pattern.compile("^.*$"));

@@ -18,7 +18,7 @@ public class Runner {
         log.info(text.toString());
         text.forEach(i -> log.info(i.toString()));
 
-        Iterator<?> iterator = text.iterator(PunctuationSymbol.class);
+        Iterator<?> iterator = text.deepIterator(Sentence.class);
         while (iterator.hasNext()) {
             log.info(iterator.next().toString());
         }

@@ -3,9 +3,6 @@ package com.epam.am.text.entity;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractComposite<E extends Component> implements Composite<E> {
@@ -37,28 +34,57 @@ public abstract class AbstractComposite<E extends Component> implements Composit
         return componentList.iterator();
     }
 
-    public <T extends Component> Iterator<T> iterator(Class<T> clazz) {
-        return flatten().stream()
-                .filter(i -> clazz.isAssignableFrom(i.getClass()))
-                .map(i -> (T) i)
-                .iterator();
-    }
+    public <T extends Component> Iterator<T> deepIterator(Class<T> clazz) {
+        if (componentList.isEmpty()) {
+            return new Iterator<T>() {
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
 
-    public List<? super Component> flatten() {
-        List<? super Component> resList = new ArrayList<>();
-        flatten(this, resList);
-        return resList;
-    }
+                @Override
+                public T next() {
+                    return null;
+                }
+            };
+        }
 
-    private void flatten(Iterable<? extends Component> iterable, List<? super Component> resList) {
-        StreamSupport
-                .stream(iterable.spliterator(), false)
-                .forEach(component -> {
-                    resList.add(component);
-                    if (component instanceof Composite) {
-                        Composite composite = (Composite) component;
-                        flatten(composite, resList);
+        return new Iterator<T>() {
+            private Iterator<E> wrappedIterator = componentList.iterator();
+            private Iterator<T> innerIterator = null;
+            private T next;
+
+            @Override
+            public boolean hasNext() {
+                if (innerIterator != null) {
+                    if (innerIterator.hasNext()) {
+                        next = innerIterator.next();
+                        return true;
+                    } else {
+                        innerIterator = null;
                     }
-                });
+                }
+
+                if (!wrappedIterator.hasNext()) return false;
+
+                E tmpNext = wrappedIterator.next();
+                if (tmpNext.getClass().isAssignableFrom(clazz)) {
+                    next = (T) tmpNext;
+                    return true;
+                } else {
+                    if (tmpNext instanceof AbstractComposite) {
+                        innerIterator = ((AbstractComposite) tmpNext).deepIterator(clazz);
+                        return hasNext();
+                    } else {
+                        return hasNext();
+                    }
+                }
+            }
+
+            @Override
+            public T next() {
+                return next;
+            }
+        };
     }
 }

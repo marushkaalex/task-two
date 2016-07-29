@@ -15,4 +15,20 @@ public abstract class Symbol implements Leaf {
     public String toString() {
         return String.valueOf(value);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Symbol)) return false;
+
+        Symbol symbol = (Symbol) o;
+
+        return value == symbol.value;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) value;
+    }
 }

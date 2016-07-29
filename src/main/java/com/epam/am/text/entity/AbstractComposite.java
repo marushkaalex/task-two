@@ -1,6 +1,7 @@
 package com.epam.am.text.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -36,17 +37,7 @@ public abstract class AbstractComposite<E extends Component> implements Composit
 
     public <T extends Component> Iterator<T> deepIterator(Class<T> clazz) {
         if (componentList.isEmpty()) {
-            return new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return false;
-                }
-
-                @Override
-                public T next() {
-                    return null;
-                }
-            };
+            return Collections.emptyIterator();
         }
 
         return new Iterator<T>() {

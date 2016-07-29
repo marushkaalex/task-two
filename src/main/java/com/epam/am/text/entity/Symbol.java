@@ -1,6 +1,6 @@
 package com.epam.am.text.entity;
 
-public abstract class Symbol implements Leaf {
+public abstract class Symbol implements Leaf, Comparable<Symbol> {
     private char value;
 
     public Symbol(char value) {
@@ -30,5 +30,10 @@ public abstract class Symbol implements Leaf {
     @Override
     public int hashCode() {
         return (int) value;
+    }
+
+    @Override
+    public int compareTo(Symbol o) {
+        return Character.compare(value, o.value);
     }
 }

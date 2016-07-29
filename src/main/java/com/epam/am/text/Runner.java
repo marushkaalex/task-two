@@ -3,6 +3,7 @@ package com.epam.am.text;
 import com.epam.am.text.entity.Sentence;
 import com.epam.am.text.entity.Text;
 import com.epam.am.text.entity.Word;
+import com.epam.am.text.entity.WordSymbol;
 import com.epam.am.text.parser.Parser;
 import com.epam.am.text.parser.RegexParser;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ public class Runner {
 
         task2(text);
         task3(text);
+        task6(text);
     }
 
     private static String readFile(String fileName) {
@@ -94,5 +96,37 @@ public class Runner {
             i.toPlainString(sb);
             log.info(sb.toString());
         });
+    }
+
+    private static void task6(Text text) {
+        log.info("=== Task 6 ===");
+        Iterator<Word> wordIterator = text.deepIterator(Word.class);
+        Map<WordSymbol, Set<Word>> map = new HashMap<>();
+
+        while (wordIterator.hasNext()) {
+            Word next = wordIterator.next();
+            Iterator<WordSymbol> symbolIterator = next.iterator();
+            WordSymbol firstSymbol = symbolIterator.next();
+            Set<Word> words = map.get(firstSymbol);
+
+            if (words == null) {
+                words = new HashSet<>();
+                map.put(firstSymbol, words);
+            }
+
+            words.add(next);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        map
+                .entrySet()
+                .stream()
+                .sorted((lhs, rhs) -> lhs.getKey().compareTo(rhs.getKey()))
+                .map(i -> {
+                    sb.setLength(0);
+                    i.getValue().stream().forEach(j -> { j.toPlainString(sb); sb.append(' '); } );
+                    return String.format("%s: %s", i.getKey(), sb);
+                })
+                .forEach(log::info);
     }
 }

@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 
 public class Runner {
     private static final Logger log = LoggerFactory.getLogger(Runner.class);
@@ -29,6 +30,7 @@ public class Runner {
         task2(text);
         task3(text);
         task6(text);
+        task9(text, new WordSymbol('а'));
     }
 
     private static String readFile(String fileName) {
@@ -124,9 +126,63 @@ public class Runner {
                 .sorted((lhs, rhs) -> lhs.getKey().compareTo(rhs.getKey()))
                 .map(i -> {
                     sb.setLength(0);
-                    i.getValue().stream().forEach(j -> { j.toPlainString(sb); sb.append(' '); } );
+                    i.getValue().stream().forEach(j -> {
+                        j.toPlainString(sb);
+                        sb.append(' ');
+                    });
                     return String.format("%s: %s", i.getKey(), sb);
                 })
                 .forEach(log::info);
+    }
+
+    private static void task9(Text text, WordSymbol symbol) {
+        log.info("=== Task 9 ===");
+        Iterator<Word> wordIterator = text.deepIterator(Word.class);
+
+        Map<Word, Integer> symbolCountMap = new HashMap<>();
+
+        while (wordIterator.hasNext()) {
+            Word word = wordIterator.next();
+            if (symbolCountMap.containsKey(word)) continue;
+
+            Iterator<WordSymbol> symbolIterator = word.iterator();
+            int count = 0;
+
+            while (symbolIterator.hasNext()) {
+                WordSymbol wordSymbol = symbolIterator.next();
+                if (wordSymbol.equals(symbol)) {
+                    count++;
+                }
+            }
+
+            symbolCountMap.put(word, count);
+        }
+
+        Map<Integer, List<Word>> outputMap = new HashMap<>(symbolCountMap.size());
+        for (Map.Entry<Word, Integer> entry : symbolCountMap.entrySet()) {
+            List<Word> wordList = outputMap.get(entry.getValue());
+
+            if (wordList == null) {
+                wordList = new ArrayList<>();
+                outputMap.put(entry.getValue(), wordList);
+            }
+
+            wordList.add(entry.getKey());
+        }
+
+        StringBuilder sb = new StringBuilder();
+        outputMap
+                .entrySet()
+                .stream()
+                .sorted((lhs, rhs) -> Integer.compare(lhs.getKey(), rhs.getKey()))
+                .forEach(i -> {
+                    Collections.sort(i.getValue());
+                    sb.setLength(0);
+                    for (Word word : i.getValue()) {
+                        word.toPlainString(sb);
+                        sb.append(' ');
+                    }
+                    log.info("{}: {}", i.getKey(), sb);
+                });
     }
 }

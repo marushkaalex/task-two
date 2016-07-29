@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 public abstract class AbstractComposite<E extends Component> implements Composite<E> {
-    private List<E> componentList = new ArrayList<>();
+    protected List<E> componentList = new ArrayList<>();
 
     public void add(E component) {
         componentList.add(component);

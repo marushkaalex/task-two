@@ -30,7 +30,7 @@ public class RegexParser implements Parser {
     private  <T extends Component> T parse(Class<T> componentClass, String source, int start, int end) {
         try {
             if (Symbol.class.isAssignableFrom(componentClass)) {
-                return (T) parseSymbol(componentClass, source, start);
+                return (T) parseSymbol((Class<Symbol>) componentClass, source, start);
             }
 
             T t;
@@ -75,14 +75,13 @@ public class RegexParser implements Parser {
             }
 
             return t;
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new ParsingException(e);
         }
     }
 
-    private Symbol parseSymbol(Class<? extends Component> symbolClass, String source, int position)
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        return ((Symbol) symbolClass.getDeclaredConstructor(char.class).newInstance(source.charAt(position)));
+    private Symbol parseSymbol(Class<? extends Symbol> symbolClass, String source, int position) {
+        return Symbol.of(source.charAt(position), symbolClass);
     }
 
     public static class DefaultConfig {

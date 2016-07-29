@@ -1,6 +1,14 @@
 package com.epam.am.text.entity;
 
+import com.epam.am.text.parser.ParsingException;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class Symbol implements Leaf, Comparable<Symbol> {
+    private static final Map<Character, Symbol> CACHE = new HashMap<>();
+
     private char value;
 
     public Symbol(char value) {
@@ -35,5 +43,20 @@ public abstract class Symbol implements Leaf, Comparable<Symbol> {
     @Override
     public int compareTo(Symbol o) {
         return Character.compare(value, o.value);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Symbol> T of(char value, Class<T> clazz) {
+        Symbol symbol = CACHE.get(value);
+        if (symbol == null) {
+            try {
+                symbol = clazz.getDeclaredConstructor(char.class).newInstance(value);
+                CACHE.put(value, symbol);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new ParsingException(e);
+            }
+        }
+
+        return (T) symbol;
     }
 }
